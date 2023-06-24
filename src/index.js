@@ -3,14 +3,13 @@ import {
   byeUsername,
   setPromtMessage,
 } from "./helloUsername.js";
-import { handleInput, handleExit } from "./handleStream.js";
-import { handeChangePath, handleDirUp } from "./handlePath.js";
+import { handleChangePath, handleDirUp, makePath } from "./handlePath.js";
 import readline from "readline";
 import os from "os";
-import { list } from "./handleFileOperations.js";
+import { list, readFile } from "./handleFileOperations.js";
+import path from "path";
 
-const inputName = helloUsername();
-const username = inputName.charAt(0).toUpperCase() + inputName.slice(1);
+const username = helloUsername();
 console.log(`Welcome to the File Manager, ${username}! \n`);
 //await handleInput();
 //await handleExit(username);
@@ -31,10 +30,10 @@ rl.on("line", async (line) => {
   const command =
     indexOfFirstSpace === -1 ? input : input.substring(0, indexOfFirstSpace);
   const content = input.substring(indexOfFirstSpace + 1, input.length);
-  const __dirname = process.cwd();
+  const currentDir = process.cwd();
   switch (command) {
     case "cd":
-      handeChangePath(__dirname, content);
+      handleChangePath(makePath(currentDir, content));
       setPromtMessage(rl, process.cwd());
       break;
     case "up":
@@ -42,8 +41,12 @@ rl.on("line", async (line) => {
       setPromtMessage(rl, process.cwd());
       break;
     case "ls":
-      await list(__dirname);
-      setPromtMessage(rl, __dirname);
+      await list(currentDir);
+      setPromtMessage(rl, currentDir);
+      break;
+    case "cat":
+      const filePath = makePath(currentDir, content);
+      await readFile(filePath).catch((err) => console.log(err.message + "\n"));
       break;
     case "hello":
       console.log("world! \n");

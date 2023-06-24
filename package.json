@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "start:n": "node src/index.js --username=Igor"
+    "start:n": "node src/index.js --username=anonymous"
   },
   "author": "Margarita Kravtsova",
   "license": "ISC"

@@ -1,10 +1,11 @@
 import path from "path";
 
-export const handeChangePath = (pathDir, content) => {
+export const makePath = (pathDir, content) => {
+  return path.isAbsolute(content) ? content : path.join(pathDir, content);
+};
+
+export const handleChangePath = (newPath) => {
   try {
-    const newPath = path.isAbsolute(content)
-      ? content
-      : path.join(pathDir, content);
     process.chdir(newPath);
   } catch (err) {
     console.log(err.message + "\n");
