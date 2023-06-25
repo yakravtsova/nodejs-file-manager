@@ -6,7 +6,12 @@ import {
 import { handleChangePath, handleDirUp, makePath } from "./handlePath.js";
 import readline from "readline";
 import os from "os";
-import { createFile, list, readFile } from "./handleFileOperations.js";
+import {
+  createFile,
+  list,
+  readFile,
+  renameFile,
+} from "./handleFileOperations.js";
 import path from "path";
 
 const username = helloUsername();
@@ -51,8 +56,20 @@ rl.on("line", async (line) => {
     case "add":
       await createFile(filePath).catch((err) => console.log(err.message));
       break;
-    case "hello":
-      console.log("world! \n");
+    case "rn":
+      const contentPieces = content.split(" ");
+      const newFilename = contentPieces[contentPieces.length - 1];
+      const pathToFile = makePath(
+        currentDir,
+        content.substring(0, content.length - newFilename.length).trim()
+      );
+      const pathPieces = pathToFile.split("/");
+      pathPieces.pop();
+      const fileDirPath = pathPieces.join("/");
+      const newPathToFile = makePath(fileDirPath, newFilename);
+      await renameFile(pathToFile, newPathToFile).catch((err) =>
+        console.log(err.message)
+      );
       break;
     case ".exit":
       byeUsername(username);

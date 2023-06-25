@@ -53,3 +53,19 @@ export const createFile = async (filePath) => {
     });
   });
 };
+
+export const renameFile = async (filePath, newFilePath) => {
+  return new Promise((res, rej) => {
+    const readStream = fs.createReadStream(filePath);
+    readStream.on("data", () => {
+      process.stdout.write("\n");
+    });
+    readStream.on("end", () => {
+      fs.rename(filePath, newFilePath, (err) => {
+        if (err) throw new Error("Unexpected error");
+      });
+      res();
+    });
+    readStream.on("error", (err) => rej(err));
+  });
+};
