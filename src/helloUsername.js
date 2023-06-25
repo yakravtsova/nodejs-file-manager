@@ -17,7 +17,7 @@ export const helloUsername = () => {
 };
 
 export const byeUsername = (username) => {
-  console.log(`Thank you for using File Manager, ${username}, goodbye!`);
+  console.log(`\nThank you for using File Manager, ${username}, goodbye!`);
   process.exit(0);
 };
 

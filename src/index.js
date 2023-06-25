@@ -6,11 +6,11 @@ import {
 import { handleChangePath, handleDirUp, makePath } from "./handlePath.js";
 import readline from "readline";
 import os from "os";
-import { list, readFile } from "./handleFileOperations.js";
+import { createFile, list, readFile } from "./handleFileOperations.js";
 import path from "path";
 
 const username = helloUsername();
-console.log(`Welcome to the File Manager, ${username}! \n`);
+console.log(`Welcome to the File Manager, ${username}!`);
 //await handleInput();
 //await handleExit(username);
 const homedir = os.homedir();
@@ -19,7 +19,7 @@ process.chdir(homedir);
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-  prompt: `You are currently in ${homedir} \n`,
+  prompt: `\nYou are currently in ${homedir} \n`,
 });
 
 rl.prompt();
@@ -31,6 +31,7 @@ rl.on("line", async (line) => {
     indexOfFirstSpace === -1 ? input : input.substring(0, indexOfFirstSpace);
   const content = input.substring(indexOfFirstSpace + 1, input.length);
   const currentDir = process.cwd();
+  const filePath = makePath(currentDir, content);
   switch (command) {
     case "cd":
       handleChangePath(makePath(currentDir, content));
@@ -45,8 +46,10 @@ rl.on("line", async (line) => {
       setPromtMessage(rl, currentDir);
       break;
     case "cat":
-      const filePath = makePath(currentDir, content);
-      await readFile(filePath).catch((err) => console.log(err.message + "\n"));
+      await readFile(filePath).catch((err) => console.log(err.message));
+      break;
+    case "add":
+      await createFile(filePath).catch((err) => console.log(err.message));
       break;
     case "hello":
       console.log("world! \n");
