@@ -35,38 +35,33 @@ export const readFile = async (filePath) => {
 
 export const createFile = async (filePath) => {
   return new Promise((res, rej) => {
-    const readStream = fs.createReadStream(filePath);
-    readStream.on("data", () => {
-      process.stdout.write("\n");
+    fs.open(filePath, "r", (err) => {
+      if (!err) rej(new Error(`Error: File ${filePath} already exists`));
     });
-    readStream.on("end", () => {
-      rej(new Error("Error: File already exists"));
+    const writeStream = fs.createWriteStream(filePath);
+    writeStream.on("error", (err) => {
+      rej(err);
     });
-    readStream.on("error", () => {
-      const writeStream = fs.createWriteStream(filePath);
-      writeStream.on("error", (err) => {
-        console.log(err.message);
-      });
-      writeStream.end(() => {
-        res();
-      });
+    writeStream.end(() => {
+      res();
     });
   });
 };
 
 export const renameFile = async (filePath, newFilePath) => {
   return new Promise((res, rej) => {
-    const readStream = fs.createReadStream(filePath);
-    readStream.on("data", () => {
-      process.stdout.write("\n");
+    fs.open(filePath, "r", (err) => {
+      if (err) rej(err);
     });
-    readStream.on("end", () => {
-      fs.rename(filePath, newFilePath, (err) => {
-        if (err) throw new Error("Unexpected error");
-      });
-      res();
+    fs.open(newFilePath, "r", (err) => {
+      if (!err) rej(new Error(`Error: File ${newFilePath} already exists`));
     });
-    readStream.on("error", (err) => rej(err));
+    fs.rename(filePath, newFilePath, (err) => {
+      if (err) rej(err);
+      else {
+        res();
+      }
+    });
   });
 };
 
@@ -137,7 +132,7 @@ export const moveFile = async (filePath, newFolderPath) => {
 
 export const deleteFile = async (filePath) => {
   return new Promise((res, rej) => {
-    fs.access(filePath, fs.constants.R_OK, (err) => {
+    fs.open(filePath, "r", (err) => {
       if (err) {
         rej(err);
       }

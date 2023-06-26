@@ -25,6 +25,10 @@ import {
   handleGetEOL,
   handleGetUsername,
 } from "./handleOSData.js";
+import {
+  handleCompressFile,
+  handleDecompressFile,
+} from "./handleFileCompressing.js";
 
 const username = helloUsername();
 console.log(`Welcome to the File Manager, ${username}!`);
@@ -129,6 +133,24 @@ rl.on("line", async (line) => {
           break;
       }
       break;
+    case "compress": {
+      const { beforeLastSpace, afterLastSpace } = handleParseContent(content);
+      const pathToFile = path.resolve(currentDir, beforeLastSpace);
+      const pathToArch = path.resolve(currentDir, afterLastSpace);
+      await handleCompressFile(pathToFile, pathToArch).catch((err) => {
+        console.log(err.message);
+      });
+      break;
+    }
+    case "decompress": {
+      const { beforeLastSpace, afterLastSpace } = handleParseContent(content);
+      const pathToArch = path.resolve(currentDir, beforeLastSpace);
+      const pathToFile = path.resolve(currentDir, afterLastSpace);
+      await handleDecompressFile(pathToFile, pathToArch).catch((err) => {
+        console.log(err.message);
+      });
+      break;
+    }
     case ".exit":
       byeUsername(username);
     default:
