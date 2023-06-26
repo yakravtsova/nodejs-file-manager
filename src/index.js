@@ -10,6 +10,7 @@ import {
   copyFile,
   createFile,
   list,
+  moveFile,
   readFile,
   renameFile,
 } from "./handleFileOperations.js";
@@ -72,9 +73,16 @@ rl.on("line", async (line) => {
       const pathToFile = path.resolve(currentDir, beforeLastSpace);
       const pathToNewDir = path.resolve(currentDir, afterLastSpace);
       await copyFile(pathToFile, pathToNewDir).catch((err) => {
-        if (err !== null) {
-          console.log(err.message);
-        } else console.log("Error");
+        console.log(err.message);
+      });
+      break;
+    }
+    case "mv": {
+      const { beforeLastSpace, afterLastSpace } = handleParseContent(content);
+      const pathToFile = path.resolve(currentDir, beforeLastSpace);
+      const pathToNewDir = path.resolve(currentDir, afterLastSpace);
+      await moveFile(pathToFile, pathToNewDir).catch((err) => {
+        console.log(err.message);
       });
       break;
     }
