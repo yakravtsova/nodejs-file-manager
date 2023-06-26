@@ -69,3 +69,33 @@ export const renameFile = async (filePath, newFilePath) => {
     readStream.on("error", (err) => rej(err));
   });
 };
+
+export const copyFile = async (filePath, newFolderPath) => {
+  const copyFilePath = path.resolve(newFolderPath, path.basename(filePath));
+  return new Promise((res, rej) => {
+    fs.access(newFolderPath, fs.constants.R_OK, (err) => {
+      if (err) {
+        rej(err);
+      }
+    });
+    const readStream = fs.createReadStream(filePath);
+    readStream.on("data", (data) => {
+      const readCopyStream = fs.createReadStream(copyFilePath);
+      readCopyStream.on("data", () => {
+        process.stdout.write("");
+      });
+      readCopyStream.on("end", () => {
+        rej(new Error("Error: File already exists"));
+      });
+      readCopyStream.on("error", () => {
+        const writeCopyStream = fs.createWriteStream(copyFilePath);
+        writeCopyStream.write(data);
+        writeCopyStream.on("error", (err) => {
+          rej(err);
+        });
+        writeCopyStream.end(() => res());
+      });
+    });
+    readStream.on("error", (err) => rej(err));
+  });
+};

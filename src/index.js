@@ -3,21 +3,21 @@ import {
   byeUsername,
   setPromtMessage,
 } from "./helloUsername.js";
-import { handleChangePath, handleDirUp, makePath } from "./handlePath.js";
+import { handleChangePath, handleDirUp } from "./handlePath.js";
 import readline from "readline";
 import os from "os";
 import {
+  copyFile,
   createFile,
   list,
   readFile,
   renameFile,
 } from "./handleFileOperations.js";
+import { handleParseContent } from "./utils.js";
 import path from "path";
 
 const username = helloUsername();
 console.log(`Welcome to the File Manager, ${username}!`);
-//await handleInput();
-//await handleExit(username);
 const homedir = os.homedir();
 process.chdir(homedir);
 
@@ -36,10 +36,10 @@ rl.on("line", async (line) => {
     indexOfFirstSpace === -1 ? input : input.substring(0, indexOfFirstSpace);
   const content = input.substring(indexOfFirstSpace + 1, input.length);
   const currentDir = process.cwd();
-  const filePath = makePath(currentDir, content);
+  const filePath = path.resolve(currentDir, content);
   switch (command) {
     case "cd":
-      handleChangePath(makePath(currentDir, content));
+      handleChangePath(path.resolve(currentDir, content));
       setPromtMessage(rl, process.cwd());
       break;
     case "up":
@@ -56,21 +56,28 @@ rl.on("line", async (line) => {
     case "add":
       await createFile(filePath).catch((err) => console.log(err.message));
       break;
-    case "rn":
-      const contentPieces = content.split(" ");
-      const newFilename = contentPieces[contentPieces.length - 1];
-      const pathToFile = makePath(
-        currentDir,
-        content.substring(0, content.length - newFilename.length).trim()
-      );
-      const pathPieces = pathToFile.split("/");
-      pathPieces.pop();
-      const fileDirPath = pathPieces.join("/");
-      const newPathToFile = makePath(fileDirPath, newFilename);
+    case "rn": {
+      const { beforeLastSpace, afterLastSpace } = handleParseContent(content);
+      const newFilename = afterLastSpace;
+      const pathToFile = path.resolve(currentDir, beforeLastSpace);
+      const dirPath = path.dirname(pathToFile);
+      const newPathToFile = path.resolve(dirPath, newFilename);
       await renameFile(pathToFile, newPathToFile).catch((err) =>
         console.log(err.message)
       );
       break;
+    }
+    case "cp": {
+      const { beforeLastSpace, afterLastSpace } = handleParseContent(content);
+      const pathToFile = path.resolve(currentDir, beforeLastSpace);
+      const pathToNewDir = path.resolve(currentDir, afterLastSpace);
+      await copyFile(pathToFile, pathToNewDir).catch((err) => {
+        if (err !== null) {
+          console.log(err.message);
+        } else console.log("Error");
+      });
+      break;
+    }
     case ".exit":
       byeUsername(username);
     default:
