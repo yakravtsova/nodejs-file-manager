@@ -24,3 +24,7 @@ export const byeUsername = (username) => {
 export const setPromtMessage = (readlineInterface, pathDir) => {
   readlineInterface.setPrompt(`\nYou are currently in ${pathDir} \n`);
 };
+
+export const handleInvalidInput = () => {
+  console.log(`Invalid input`);
+};

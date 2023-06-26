@@ -2,6 +2,7 @@ import {
   helloUsername,
   byeUsername,
   setPromtMessage,
+  handleInvalidInput,
 } from "./helloUsername.js";
 import { handleChangePath, handleDirUp } from "./handlePath.js";
 import readline from "readline";
@@ -18,6 +19,12 @@ import {
 import { handleParseContent } from "./utils.js";
 import path from "path";
 import { handleHash } from "./handleHash.js";
+import {
+  handleGetArch,
+  handleGetCups,
+  handleGetEOL,
+  handleGetUsername,
+} from "./handleOSData.js";
 
 const username = helloUsername();
 console.log(`Welcome to the File Manager, ${username}!`);
@@ -100,10 +107,32 @@ rl.on("line", async (line) => {
       });
       break;
     }
+    case "os":
+      switch (content) {
+        case "--EOL":
+          handleGetEOL();
+          break;
+        case "--homedir":
+          console.log(homedir);
+          break;
+        case "--username":
+          handleGetUsername();
+          break;
+        case "--architecture":
+          handleGetArch();
+          break;
+        case "--cpus":
+          handleGetCups();
+          break;
+        default:
+          handleInvalidInput();
+          break;
+      }
+      break;
     case ".exit":
       byeUsername(username);
     default:
-      console.log(`Invalid input \n`);
+      handleInvalidInput();
       break;
   }
   rl.prompt();
