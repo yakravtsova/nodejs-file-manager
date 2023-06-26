@@ -134,3 +134,17 @@ export const moveFile = async (filePath, newFolderPath) => {
     readStream.on("error", (err) => rej(err));
   });
 };
+
+export const deleteFile = async (filePath) => {
+  return new Promise((res, rej) => {
+    fs.access(filePath, fs.constants.R_OK, (err) => {
+      if (err) {
+        rej(err);
+      }
+    });
+    fs.unlink(filePath, (err) => {
+      if (err) rej(err);
+      res();
+    });
+  });
+};

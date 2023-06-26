@@ -9,6 +9,7 @@ import os from "os";
 import {
   copyFile,
   createFile,
+  deleteFile,
   list,
   moveFile,
   readFile,
@@ -16,6 +17,7 @@ import {
 } from "./handleFileOperations.js";
 import { handleParseContent } from "./utils.js";
 import path from "path";
+import { handleHash } from "./handleHash.js";
 
 const username = helloUsername();
 console.log(`Welcome to the File Manager, ${username}!`);
@@ -82,6 +84,18 @@ rl.on("line", async (line) => {
       const pathToFile = path.resolve(currentDir, beforeLastSpace);
       const pathToNewDir = path.resolve(currentDir, afterLastSpace);
       await moveFile(pathToFile, pathToNewDir).catch((err) => {
+        console.log(err.message);
+      });
+      break;
+    }
+    case "rm": {
+      const filePath = path.resolve(currentDir, content);
+      await deleteFile(filePath).catch((err) => console.log(err.message));
+      break;
+    }
+    case "hash": {
+      const filePath = path.resolve(currentDir, content);
+      await handleHash(filePath).catch((err) => {
         console.log(err.message);
       });
       break;
